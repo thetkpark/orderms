@@ -1,6 +1,8 @@
 package order
 
 import (
+	"errors"
+	"net/http"
 	"testing"
 )
 
@@ -46,5 +48,30 @@ func TestOnlyAcceptOfflineChannel(t *testing.T) {
 	want := "Online is not accepted"
 	if want != c.response["message"] {
 		t.Errorf("%q is expected but got %q\n", want, c.response["message"])
+	}
+}
+
+type fakeContextBadRequest struct {
+	code     int
+	response map[string]string
+}
+
+func (c fakeContextBadRequest) Order() (Order, error) {
+	return Order{}, errors.New("something went wrong")
+}
+func (c *fakeContextBadRequest) JSON(code int, v interface{}) {
+	c.code = code
+	c.response = v.(map[string]string)
+}
+
+func TestBadRequestOrderWentWrong(t *testing.T) {
+	handler := &Handler{}
+
+	c := &fakeContextBadRequest{}
+	handler.Order(c)
+
+	want := http.StatusBadRequest
+	if want != c.code {
+		t.Errorf("%d status code expected, but got %d", want, c.code)
 	}
 }
