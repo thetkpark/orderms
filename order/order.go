@@ -1,6 +1,9 @@
 package order
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 type Context interface {
 	Order() (Order, error)
@@ -19,7 +22,7 @@ func (h *Handler) Order(c Context) {
 
 	if order.SalesChannel != h.channel {
 		c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "Offline is not accepted",
+			"message": fmt.Sprintf("%s is not accepted", order.SalesChannel),
 		})
 	}
 }

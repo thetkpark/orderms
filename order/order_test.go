@@ -5,13 +5,14 @@ import (
 )
 
 type fakeContext struct {
+	channel  string
 	code     int
 	response map[string]string
 }
 
 func (c fakeContext) Order() (Order, error) {
 	return Order{
-		SalesChannel: "Offline",
+		SalesChannel: c.channel,
 	}, nil
 }
 
@@ -25,10 +26,24 @@ func TestOnlyAcceptOnlineChannel(t *testing.T) {
 		channel: "Online",
 	}
 
-	c := &fakeContext{}
+	c := &fakeContext{channel: "Offline"}
 	handler.Order(c)
 
 	want := "Offline is not accepted"
+	if want != c.response["message"] {
+		t.Errorf("%q is expected but got %q\n", want, c.response["message"])
+	}
+}
+
+func TestOnlyAcceptOfflineChannel(t *testing.T) {
+	handler := &Handler{
+		channel: "Offline",
+	}
+
+	c := &fakeContext{channel: "Online"}
+	handler.Order(c)
+
+	want := "Online is not accepted"
 	if want != c.response["message"] {
 		t.Errorf("%q is expected but got %q\n", want, c.response["message"])
 	}
