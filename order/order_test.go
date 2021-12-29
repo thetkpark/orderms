@@ -146,3 +146,18 @@ func TestOrderFailAtSave(t *testing.T) {
 		t.Errorf("%d is expected but got %d\n", want, c.code)
 	}
 }
+
+func TestOrderIsOK(t *testing.T) {
+	store := &spyStore{}
+	handler := &Handler{
+		channel: "Online",
+		store:   store,
+	}
+
+	c := &fakeContext{channel: "Online"}
+	handler.Order(c)
+
+	if _, ok := c.response["message"]; !ok {
+		t.Errorf("message key is expected")
+	}
+}

@@ -42,4 +42,8 @@ func (h *Handler) Order(c Context) {
 		})
 		return
 	}
+
+	c.JSON(http.StatusOK, map[string]string{
+		"message": "ok",
+	})
 }
