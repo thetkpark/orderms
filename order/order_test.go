@@ -123,3 +123,26 @@ func TestOrderWasSaved(t *testing.T) {
 		t.Errorf("it should store data")
 	}
 }
+
+type failStore struct{}
+
+func (f *failStore) Save(Order) error {
+	return errors.New("")
+}
+
+func TestOrderFailAtSave(t *testing.T) {
+	store := &failStore{}
+
+	handler := &Handler{
+		channel: "Online",
+		store:   store,
+	}
+
+	c := &fakeContext{channel: "Online"}
+	handler.Order(c)
+
+	want := http.StatusInternalServerError
+	if want != c.code {
+		t.Errorf("%d is expected but got %d\n", want, c.code)
+	}
+}

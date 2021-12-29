@@ -36,4 +36,10 @@ func (h *Handler) Order(c Context) {
 	}
 
 	err = h.store.Save(order)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+		return
+	}
 }
