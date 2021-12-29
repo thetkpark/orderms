@@ -19,6 +19,13 @@ type Handler struct {
 	store   Store
 }
 
+func NewHandler(channel string, store Store) *Handler {
+	return &Handler{
+		channel: channel,
+		store:   store,
+	}
+}
+
 func (h *Handler) Order(c Context) {
 	order, err := c.Order()
 	if err != nil {
