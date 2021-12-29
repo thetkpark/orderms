@@ -100,3 +100,26 @@ func TestOnlyCalledJSONOnce(t *testing.T) {
 		t.Errorf("it should called one time but got %d times", c.jsonCalledCount)
 	}
 }
+
+type spyStore struct {
+	wasCalled bool
+}
+
+func (s *spyStore) Save(order Order) error {
+	s.wasCalled = true
+	return nil
+}
+
+func TestOrderWasSaved(t *testing.T) {
+	spy := &spyStore{}
+	handler := &Handler{
+		channel: "Online",
+		store:   spy,
+	}
+	c := &fakeContext{channel: "Online"}
+	handler.Order(c)
+
+	if !spy.wasCalled {
+		t.Errorf("it should store data")
+	}
+}

@@ -10,8 +10,13 @@ type Context interface {
 	JSON(code int, v interface{})
 }
 
+type Store interface {
+	Save(order Order) error
+}
+
 type Handler struct {
 	channel string
+	store   Store
 }
 
 func (h *Handler) Order(c Context) {
@@ -29,4 +34,6 @@ func (h *Handler) Order(c Context) {
 		})
 		return
 	}
+
+	err = h.store.Save(order)
 }
